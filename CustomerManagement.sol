@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 contract CustomerManagement {
-    // Data structure for Customer
+    
     struct Customer {
         string geography;
         uint256 creditScore;
@@ -13,7 +13,7 @@ contract CustomerManagement {
         bytes32 passwordHash; // Store hashed passwords
     }
 
-    // State Variables
+    
     address public owner; // Contract Owner
     mapping(address => bool) public managers; // List of managers
     mapping(uint256 => Customer) public customers; // List of customers
@@ -22,10 +22,10 @@ contract CustomerManagement {
     string private managerPasswordHash; // Hashed Manager Password
     uint256 public customerCount;
 
-    // Events
+    
     event OTPGenerated(address indexed requester, uint256 otp);
 
-    // Modifiers
+   
     modifier onlyOwner() {
         require(msg.sender == owner, "Not authorized: Only owner");
         _;
@@ -57,9 +57,9 @@ contract CustomerManagement {
         managers[msg.sender] = true; // Owner is the first manager
     }
 
-    // FUNCTIONS
+   
 
-    // 1. Add Manager
+    
     function addManager(address _manager, string memory _managerPassword,uint256 _otp) public onlyOwner {
         _managerPassword=string(abi.encodePacked(keccak256(abi.encodePacked(_managerPassword))));
         require(
@@ -73,7 +73,7 @@ contract CustomerManagement {
         managers[_manager] = true;
     }
 
-    // 2. Add Customer
+    
     function addCustomer(
         uint256 _customerId,
         string memory _geography,
@@ -102,7 +102,7 @@ contract CustomerManagement {
         customerCount++;
     }
 
-    // 3. Delete Customer
+    
     function deleteCustomer(uint256 _customerId, string memory _managerPassword) public onlyManager(_managerPassword) {
         require(customers[_customerId].age != 0, "Customer does not exist");
 
@@ -110,7 +110,7 @@ contract CustomerManagement {
         customerCount--;
     }
 
-    // 4. Update Customer
+    
     function updateCustomer(
         uint256 _customerId,
         string memory _geography,
@@ -138,7 +138,7 @@ contract CustomerManagement {
         });
     }
 
-    // 5. View Customer
+    
     function viewCustomer(uint256 _customerId, string memory _managerPassword)
         public
         view
@@ -149,7 +149,7 @@ contract CustomerManagement {
         return customers[_customerId];
     }
 
-    // 6. Check Credentials and View Customer
+    
     function checkCredentialsAndViewCustomer(uint256 _customerId, string memory _password)
         public
         view
@@ -159,7 +159,7 @@ contract CustomerManagement {
         return customers[_customerId];
     }
 
-    // 7. Change Manager Password
+    
     function changeManagerPassword(string memory _currentPassword, string memory _newPassword) public onlyOwner {
         _currentPassword=string(abi.encodePacked(keccak256(abi.encodePacked(_currentPassword))));
         require(
@@ -169,7 +169,7 @@ contract CustomerManagement {
         managerPasswordHash = string(abi.encodePacked(keccak256(abi.encodePacked(_newPassword))));
     }
 
-    // 8. Generate Customer OTP
+    
     function generateCustomerOTP(uint256 _customerId, string memory _password)
         public
         customerOnly(_customerId, _password)
@@ -183,7 +183,7 @@ contract CustomerManagement {
         return otp;
     }
 
-    // 9. Generate Manager OTP
+    
     function generateManagerOTP(string memory _managerPassword) public onlyManager(_managerPassword) returns (uint256) {
         uint256 otp = uint256(
             keccak256(abi.encodePacked(block.timestamp, msg.sender))
@@ -193,7 +193,7 @@ contract CustomerManagement {
         return otp;
     }
 
-    // 10. View Customer with OTP Verification
+    
     function viewCustomerWithOTP(uint256 _customerId, uint256 _otp) public view returns (Customer memory) {
         require(
             customerOTPs[_customerId] == _otp || managerOTPs[msg.sender] == _otp,
@@ -202,7 +202,7 @@ contract CustomerManagement {
         return customers[_customerId];
     }
 
-    // 11. Get Customer Count
+    
     function getCustomerCount() public view returns (uint256) {
         return customerCount;
     }
